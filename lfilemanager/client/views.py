@@ -226,7 +226,7 @@ class NotificacionViewSet(viewsets.ModelViewSet):
 
 # ============================================================
 # Extra Functional Endpoints (Auth & Reports)
-107: # ============================================================
+# ============================================================
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
