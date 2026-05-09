@@ -39,16 +39,12 @@ def seed():
     print("- Estados de caso created.")
 
     # Admin User
-    admin_rol = Rol.objects.get(nombre='Administrador')
     if not Usuario.objects.filter(email='admin@legalfile.com').exists():
-        admin = Usuario.objects.create(
-            nombre='Admin Sistema',
+        Usuario.objects.create_superuser(
             email='admin@legalfile.com',
-            oid_rol=admin_rol,
-            estado=True
+            password='admin123',
+            nombre='Admin Sistema'
         )
-        admin.set_password('admin123')
-        admin.save()
         print("- Admin user created (admin@legalfile.com / admin123).")
 
 if __name__ == '__main__':

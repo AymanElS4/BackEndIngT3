@@ -1,0 +1,9 @@
+Django==5.2.6
+djangorestframework==3.16.1
+django-cors-headers==4.9.0
+django-filter==25.1
+djangorestframework-simplejwt==5.5.1
+PyJWT==2.12.1
+sqlparse==0.5.5
+asgiref==3.9.2
+python-dotenv==1.1.1
