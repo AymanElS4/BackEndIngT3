@@ -128,6 +128,10 @@ STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Límites de upload — deben coincidir con la validación en serializers
+DATA_UPLOAD_MAX_MEMORY_SIZE = 52_428_800   # 50 MB: cap duro para el body completo del request
+FILE_UPLOAD_MAX_MEMORY_SIZE = 2_621_440    # 2.5 MB: archivos más grandes van a disco temporal
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

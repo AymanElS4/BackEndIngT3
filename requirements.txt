@@ -7,3 +7,4 @@ PyJWT==2.12.1
 sqlparse==0.5.5
 asgiref==3.9.2
 python-dotenv==1.1.1
+filetype==1.2.0

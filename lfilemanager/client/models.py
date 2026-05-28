@@ -85,13 +85,14 @@ class Caso(models.Model):
 
 class CodigoLegal(models.Model):
     oid_codigo = models.AutoField(primary_key=True)
-    nombre_norma = models.CharField(max_length=100)
-    numero_articulo = models.CharField(max_length=50)
+    nombre_norma = models.CharField(max_length=100, db_index=True)
+    numero_articulo = models.CharField(max_length=50, db_index=True)
     texto_contenido = models.TextField()
-    vigencia = models.BooleanField(default=True)
+    vigencia = models.BooleanField(default=True, db_index=True)
     class Meta:
         db_table = 'codigo_legal'
         ordering = ['nombre_norma', 'numero_articulo']
+        unique_together = [('nombre_norma', 'numero_articulo')]
     def __str__(self): return f"{self.nombre_norma} — Art. {self.numero_articulo}"
 
 class CasoNormativa(models.Model):

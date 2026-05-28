@@ -1,6 +1,7 @@
 """
 Serializers para la API REST del sistema legal.
 """
+import filetype
 from rest_framework import serializers
 from .models import (
     Rol, Usuario, TipoCaso, EstadoCaso,
@@ -130,22 +131,27 @@ class CasoCreateSerializer(serializers.ModelSerializer):
         ]
     
     def validate_archivo_pdf(self, value):
-        """Validar que el archivo sea PDF si se proporciona."""
         if value is None:
             return value
-        
-        if not value.name.lower().endswith('.pdf'):
+
+        # Leer primeros bytes para detectar MIME real (no confiar en la extensión)
+        header = value.read(261)
+        value.seek(0)
+        kind = filetype.guess(header)
+        if kind is None or kind.mime != 'application/pdf':
+            detected = kind.mime if kind else 'desconocido'
             raise serializers.ValidationError(
-                "Solo se permiten archivos PDF. Por favor, sube un archivo con extensión .pdf"
+                f"El archivo no es un PDF válido (tipo detectado: {detected}). "
+                "Solo se permiten archivos PDF."
             )
-        
-        # Verificar tamaño máximo (50 MB)
+
         max_size = 50 * 1024 * 1024
         if value.size > max_size:
             raise serializers.ValidationError(
-                f"El archivo es demasiado grande. Máximo permitido: 50 MB. Tu archivo: {value.size / (1024*1024):.2f} MB"
+                f"El archivo es demasiado grande. Máximo: 50 MB. "
+                f"Tu archivo: {value.size / (1024 * 1024):.2f} MB"
             )
-        
+
         return value
 
     def create(self, validated_data):
@@ -154,7 +160,21 @@ class CasoCreateSerializer(serializers.ModelSerializer):
         return caso
 
 
+class CodigoLegalListSerializer(serializers.ModelSerializer):
+    """Serializer ligero para listados — omite texto_contenido para no transferir cientos de KB por request."""
+    estado_vigencia = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CodigoLegal
+        fields = ['oid_codigo', 'nombre_norma', 'numero_articulo', 'vigencia', 'estado_vigencia']
+        read_only_fields = ['oid_codigo']
+
+    def get_estado_vigencia(self, obj):
+        return 'Vigente' if obj.vigencia else 'Histórico'
+
+
 class CodigoLegalSerializer(serializers.ModelSerializer):
+    """Serializer completo para create/retrieve/update — incluye texto_contenido."""
     estado_vigencia = serializers.SerializerMethodField()
 
     class Meta:
@@ -190,6 +210,24 @@ class DocumentoSerializer(serializers.ModelSerializer):
             'ruta_archivo', 'tipo_documento', 'fecha_subida'
         ]
         read_only_fields = ['oid_documento', 'fecha_subida']
+
+    def validate_ruta_archivo(self, value):
+        header = value.read(261)
+        value.seek(0)
+        kind = filetype.guess(header)
+        if kind is None or kind.mime != 'application/pdf':
+            detected = kind.mime if kind else 'desconocido'
+            raise serializers.ValidationError(
+                f"El archivo no es un PDF válido (tipo detectado: {detected}). "
+                "Solo se permiten archivos PDF."
+            )
+        max_size = 50 * 1024 * 1024
+        if value.size > max_size:
+            raise serializers.ValidationError(
+                f"El archivo es demasiado grande. Máximo: 50 MB. "
+                f"Tu archivo: {value.size / (1024 * 1024):.2f} MB"
+            )
+        return value
 
 
 class PlanSerializer(serializers.ModelSerializer):

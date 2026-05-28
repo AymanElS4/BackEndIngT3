@@ -19,7 +19,7 @@ from .serializers import (
     RegisterSerializer, LoginSerializer, UsuarioSerializer,
     UsuarioUpdateSerializer, RolSerializer, TipoCasoSerializer,
     EstadoCasoSerializer, CasoSerializer, CasoCreateSerializer,
-    CodigoLegalSerializer, CasoNormativaSerializer, DocumentoSerializer,
+    CodigoLegalListSerializer, CodigoLegalSerializer, CasoNormativaSerializer, DocumentoSerializer,
     PlanSerializer, PagoSerializer, NotificacionSerializer
 )
 
@@ -224,11 +224,15 @@ class CasoViewSet(viewsets.ModelViewSet):
 class CodigoLegalViewSet(viewsets.ModelViewSet):
     """CRUD /api/codigos/ — Gestión de códigos legales con filtros."""
     queryset = CodigoLegal.objects.all()
-    serializer_class = CodigoLegalSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['vigencia']
     search_fields = ['nombre_norma', 'numero_articulo', 'texto_contenido']
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return CodigoLegalListSerializer
+        return CodigoLegalSerializer
 
 
 class CasoNormativaViewSet(viewsets.ModelViewSet):
