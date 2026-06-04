@@ -1,8 +1,9 @@
 """
 Serializers para la API REST del sistema legal.
 """
-import filetype
-from rest_framework import serializers
+# pylint: disable=too-few-public-methods
+import filetype  
+from rest_framework import serializers  
 from .models import (
     Rol, Usuario, TipoCaso, EstadoCaso,
     Caso, CodigoLegal, CasoNormativa, Documento,
@@ -19,6 +20,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=6)
 
     class Meta:
+        """Metaclase de RegisterSerializer."""
         model = Usuario
         fields = [
             'oid_usuario', 'nombre', 'email', 'password',
@@ -32,7 +34,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        # Usar create_user para asegurar el hashing correcto de Django
+        """Crea un nuevo usuario con rol básico y contraseña hasheada."""
         rol_basico, _ = Rol.objects.get_or_create(
             nombre='Básico',
             defaults={'descripcion': 'Usuario con acceso básico'}
@@ -57,6 +59,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
     rol_nombre = serializers.CharField(source='oid_rol.nombre', read_only=True)
 
     class Meta:
+        """Metaclase de UsuarioSerializer."""
         model = Usuario
         fields = [
             'oid_usuario', 'nombre', 'email', 'oid_rol', 'rol_nombre',
@@ -69,6 +72,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
 class UsuarioUpdateSerializer(serializers.ModelSerializer):
     """Serializer para actualizar usuario (Admin)."""
     class Meta:
+        """Metaclase de UsuarioUpdateSerializer."""
         model = Usuario
         fields = [
             'nombre', 'email', 'oid_rol', 'estado',
@@ -81,19 +85,25 @@ class UsuarioUpdateSerializer(serializers.ModelSerializer):
 # ============================================================
 
 class RolSerializer(serializers.ModelSerializer):
+    """Serializer para el modelo Rol."""
     class Meta:
+        """Metaclase de RolSerializer."""
         model = Rol
         fields = '__all__'
 
 
 class TipoCasoSerializer(serializers.ModelSerializer):
+    """Serializer para el modelo TipoCaso."""
     class Meta:
+        """Metaclase de TipoCasoSerializer."""
         model = TipoCaso
         fields = '__all__'
 
 
 class EstadoCasoSerializer(serializers.ModelSerializer):
+    """Serializer para el modelo EstadoCaso."""
     class Meta:
+        """Metaclase de EstadoCasoSerializer."""
         model = EstadoCaso
         fields = '__all__'
 
@@ -106,6 +116,7 @@ class CasoSerializer(serializers.ModelSerializer):
     documentos_count = serializers.IntegerField(source='documentos.count', read_only=True)
 
     class Meta:
+        """Metaclase de CasoSerializer."""
         model = Caso
         fields = [
             'oid_caso', 'oid_abogado', 'abogado_nombre',
@@ -121,20 +132,21 @@ class CasoSerializer(serializers.ModelSerializer):
 class CasoCreateSerializer(serializers.ModelSerializer):
     """Serializer para crear/editar un Caso con PDF."""
     archivo_pdf = serializers.FileField(required=False, allow_null=True, write_only=True)
-    
+
     class Meta:
+        """Metaclase de CasoCreateSerializer."""
         model = Caso
         fields = [
             'oid_abogado', 'oid_tipo_caso', 'oid_estado',
             'titulo', 'descripcion', 'numero_expediente',
             'fecha_inicio', 'fecha_cierre', 'juzgado', 'archivo_pdf'
         ]
-    
+
     def validate_archivo_pdf(self, value):
+        """Valida que el archivo adjunto sea un PDF válido y no supere 50 MB."""
         if value is None:
             return value
 
-        # Leer primeros bytes para detectar MIME real (no confiar en la extensión)
         header = value.read(261)
         value.seek(0)
         kind = filetype.guess(header)
@@ -155,21 +167,27 @@ class CasoCreateSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        archivo_pdf = validated_data.pop('archivo_pdf', None)
+        """Crea el Caso descartando el archivo PDF, que se gestiona por separado."""
+        validated_data.pop('archivo_pdf', None)
         caso = Caso.objects.create(**validated_data)
         return caso
 
 
 class CodigoLegalListSerializer(serializers.ModelSerializer):
-    """Serializer ligero para listados — omite texto_contenido para no transferir cientos de KB por request."""
+    """Serializer ligero para listados.
+
+    Omite texto_contenido para no transferir cientos de KB por request.
+    """
     estado_vigencia = serializers.SerializerMethodField()
 
     class Meta:
+        """Metaclase de CodigoLegalListSerializer."""
         model = CodigoLegal
         fields = ['oid_codigo', 'nombre_norma', 'numero_articulo', 'vigencia', 'estado_vigencia']
         read_only_fields = ['oid_codigo']
 
     def get_estado_vigencia(self, obj):
+        """Retorna la etiqueta de vigencia legible."""
         return 'Vigente' if obj.vigencia else 'Histórico'
 
 
@@ -178,6 +196,7 @@ class CodigoLegalSerializer(serializers.ModelSerializer):
     estado_vigencia = serializers.SerializerMethodField()
 
     class Meta:
+        """Metaclase de CodigoLegalSerializer."""
         model = CodigoLegal
         fields = [
             'oid_codigo', 'nombre_norma', 'numero_articulo',
@@ -186,14 +205,17 @@ class CodigoLegalSerializer(serializers.ModelSerializer):
         read_only_fields = ['oid_codigo']
 
     def get_estado_vigencia(self, obj):
+        """Retorna la etiqueta de vigencia legible."""
         return 'Vigente' if obj.vigencia else 'Histórico'
 
 
 class CasoNormativaSerializer(serializers.ModelSerializer):
+    """Serializer para la relación entre Caso y CodigoLegal."""
     codigo_nombre = serializers.CharField(source='oid_codigo.nombre_norma', read_only=True)
     caso_titulo = serializers.CharField(source='oid_caso.titulo', read_only=True)
 
     class Meta:
+        """Metaclase de CasoNormativaSerializer."""
         model = CasoNormativa
         fields = [
             'oid_relacion', 'oid_caso', 'caso_titulo',
@@ -203,7 +225,9 @@ class CasoNormativaSerializer(serializers.ModelSerializer):
 
 
 class DocumentoSerializer(serializers.ModelSerializer):
+    """Serializer para el modelo Documento."""
     class Meta:
+        """Metaclase de DocumentoSerializer."""
         model = Documento
         fields = [
             'oid_documento', 'oid_caso', 'nombre_archivo',
@@ -212,6 +236,7 @@ class DocumentoSerializer(serializers.ModelSerializer):
         read_only_fields = ['oid_documento', 'fecha_subida']
 
     def validate_ruta_archivo(self, value):
+        """Valida que el archivo subido sea un PDF válido y no supere 50 MB."""
         header = value.read(261)
         value.seek(0)
         kind = filetype.guess(header)
@@ -231,16 +256,20 @@ class DocumentoSerializer(serializers.ModelSerializer):
 
 
 class PlanSerializer(serializers.ModelSerializer):
+    """Serializer para el modelo Plan."""
     class Meta:
+        """Metaclase de PlanSerializer."""
         model = Plan
         fields = '__all__'
 
 
 class PagoSerializer(serializers.ModelSerializer):
+    """Serializer para el modelo Pago."""
     usuario_email = serializers.CharField(source='oid_usuario.email', read_only=True)
     plan_nombre = serializers.CharField(source='oid_plan.nombre', read_only=True)
 
     class Meta:
+        """Metaclase de PagoSerializer."""
         model = Pago
         fields = [
             'oid_pago', 'oid_usuario', 'usuario_email',
@@ -252,7 +281,9 @@ class PagoSerializer(serializers.ModelSerializer):
 
 
 class NotificacionSerializer(serializers.ModelSerializer):
+    """Serializer para el modelo Notificacion."""
     class Meta:
+        """Metaclase de NotificacionSerializer."""
         model = Notificacion
         fields = '__all__'
         read_only_fields = ['oid_notificacion', 'fecha_creacion']
