@@ -1,4 +1,4 @@
-"""
+﻿"""
 Serializers para la API REST del sistema legal.
 """
 # pylint: disable=too-few-public-methods
@@ -34,10 +34,10 @@ class RegisterSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        """Crea un nuevo usuario con rol básico y contraseña hasheada."""
+        """Crea un nuevo usuario con rol bÃ¡sico y contraseÃ±a hasheada."""
         rol_basico, _ = Rol.objects.get_or_create(
-            nombre='Básico',
-            defaults={'descripcion': 'Usuario con acceso básico'}
+            nombre='BÃ¡sico',
+            defaults={'descripcion': 'Usuario con acceso bÃ¡sico'}
         )
         password = validated_data.pop('password')
         user = Usuario.objects.create_user(
@@ -143,7 +143,7 @@ class CasoCreateSerializer(serializers.ModelSerializer):
         ]
 
     def validate_archivo_pdf(self, value):
-        """Valida que el archivo adjunto sea un PDF válido y no supere 50 MB."""
+        """Valida que el archivo adjunto sea un PDF vÃ¡lido y no supere 50 MB."""
         if value is None:
             return value
 
@@ -153,14 +153,14 @@ class CasoCreateSerializer(serializers.ModelSerializer):
         if kind is None or kind.mime != 'application/pdf':
             detected = kind.mime if kind else 'desconocido'
             raise serializers.ValidationError(
-                f"El archivo no es un PDF válido (tipo detectado: {detected}). "
+                f"El archivo no es un PDF vÃ¡lido (tipo detectado: {detected}). "
                 "Solo se permiten archivos PDF."
             )
 
         max_size = 50 * 1024 * 1024
         if value.size > max_size:
             raise serializers.ValidationError(
-                f"El archivo es demasiado grande. Máximo: 50 MB. "
+                f"El archivo es demasiado grande. MÃ¡ximo: 50 MB. "
                 f"Tu archivo: {value.size / (1024 * 1024):.2f} MB"
             )
 
@@ -188,11 +188,11 @@ class CodigoLegalListSerializer(serializers.ModelSerializer):
 
     def get_estado_vigencia(self, obj):
         """Retorna la etiqueta de vigencia legible."""
-        return 'Vigente' if obj.vigencia else 'Histórico'
+        return 'Vigente' if obj.vigencia else 'HistÃ³rico'
 
 
 class CodigoLegalSerializer(serializers.ModelSerializer):
-    """Serializer completo para create/retrieve/update — incluye texto_contenido."""
+    """Serializer completo para create/retrieve/update â€” incluye texto_contenido."""
     estado_vigencia = serializers.SerializerMethodField()
 
     class Meta:
@@ -206,11 +206,11 @@ class CodigoLegalSerializer(serializers.ModelSerializer):
 
     def get_estado_vigencia(self, obj):
         """Retorna la etiqueta de vigencia legible."""
-        return 'Vigente' if obj.vigencia else 'Histórico'
+        return 'Vigente' if obj.vigencia else 'HistÃ³rico'
 
 
 class CasoNormativaSerializer(serializers.ModelSerializer):
-    """Serializer para la relación entre Caso y CodigoLegal."""
+    """Serializer para la relaciÃ³n entre Caso y CodigoLegal."""
     codigo_nombre = serializers.CharField(source='oid_codigo.nombre_norma', read_only=True)
     caso_titulo = serializers.CharField(source='oid_caso.titulo', read_only=True)
 
@@ -236,20 +236,20 @@ class DocumentoSerializer(serializers.ModelSerializer):
         read_only_fields = ['oid_documento', 'fecha_subida']
 
     def validate_ruta_archivo(self, value):
-        """Valida que el archivo subido sea un PDF válido y no supere 50 MB."""
+        """Valida que el archivo subido sea un PDF vÃ¡lido y no supere 50 MB."""
         header = value.read(261)
         value.seek(0)
         kind = filetype.guess(header)
         if kind is None or kind.mime != 'application/pdf':
             detected = kind.mime if kind else 'desconocido'
             raise serializers.ValidationError(
-                f"El archivo no es un PDF válido (tipo detectado: {detected}). "
+                f"El archivo no es un PDF vÃ¡lido (tipo detectado: {detected}). "
                 "Solo se permiten archivos PDF."
             )
         max_size = 50 * 1024 * 1024
         if value.size > max_size:
             raise serializers.ValidationError(
-                f"El archivo es demasiado grande. Máximo: 50 MB. "
+                f"El archivo es demasiado grande. MÃ¡ximo: 50 MB. "
                 f"Tu archivo: {value.size / (1024 * 1024):.2f} MB"
             )
         return value
@@ -277,7 +277,7 @@ class PagoSerializer(serializers.ModelSerializer):
             'fecha_pago', 'metodo_pago', 'estado_pago',
             'referencia_externa'
         ]
-        read_only_fields = ['oid_pago', 'fecha_pago']
+        read_only_fields = ['oid_pago', 'fecha_pago', 'oid_usuario']
 
 
 class NotificacionSerializer(serializers.ModelSerializer):
@@ -290,3 +290,4 @@ class NotificacionSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'oid_usuario': {'required': False, 'allow_null': True}
         }
+

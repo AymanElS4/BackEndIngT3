@@ -1,6 +1,4 @@
-"""
-Views (ViewSets) para la API REST del sistema legal.
-"""
+﻿
 from rest_framework import viewsets, status, permissions, filters
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
@@ -31,7 +29,7 @@ from .serializers import (
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register_view(request):
-    """POST /api/auth/register/ — Registrar un nuevo usuario."""
+    """POST /api/auth/register/ â€” Registrar un nuevo usuario."""
     serializer = RegisterSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
@@ -53,7 +51,7 @@ def register_view(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_view(request):
-    """POST /api/auth/login/ — Login con email y password, retorna JWT."""
+    """POST /api/auth/login/ ” Login con email y password, retorna JWT."""
     serializer = LoginSerializer(data=request.data)
     if serializer.is_valid():
         email = serializer.validated_data['email']
@@ -64,7 +62,7 @@ def login_view(request):
 
         if user is None:
             return Response(
-                {'error': 'Credenciales inválidas'},
+                {'error': 'Credenciales invÃ¡lidas'},
                 status=status.HTTP_401_UNAUTHORIZED
             )
 
@@ -93,11 +91,11 @@ def login_view(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def me_view(request):
-    """GET /api/auth/me/ — Retorna info del usuario autenticado."""
+    """GET /api/auth/me/ â€” Retorna info del usuario autenticado."""
     # Extraer user_id del token
     user_id = request.auth.get('user_id') if request.auth else None
     if not user_id:
-        return Response({'error': 'Token inválido'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'error': 'Token invÃ¡lido'}, status=status.HTTP_401_UNAUTHORIZED)
 
     try:
         user = Usuario.objects.select_related('oid_rol').get(oid_usuario=user_id)
@@ -108,18 +106,18 @@ def me_view(request):
 
 
 # ============================================================
-# ViewSets — CRUD completo con filtros
+# ViewSets â€” CRUD completo con filtros
 # ============================================================
 
 class RolViewSet(viewsets.ReadOnlyModelViewSet):
-    """GET /api/roles/ — Listar roles disponibles."""
+    """GET /api/roles/ â€” Listar roles disponibles."""
     queryset = Rol.objects.all()
     serializer_class = RolSerializer
     permission_classes = [IsAuthenticated]
 
 
 class UsuarioViewSet(viewsets.ModelViewSet):
-    """CRUD /api/usuarios/ — Gestión de usuarios (solo Admin)."""
+    """CRUD /api/usuarios/ â€” GestiÃ³n de usuarios (solo Admin)."""
     queryset = Usuario.objects.select_related('oid_rol').all()
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
@@ -133,21 +131,21 @@ class UsuarioViewSet(viewsets.ModelViewSet):
 
 
 class TipoCasoViewSet(viewsets.ReadOnlyModelViewSet):
-    """GET /api/tipos-caso/ — Listar tipos de caso."""
+    """GET /api/tipos-caso/ â€” Listar tipos de caso."""
     queryset = TipoCaso.objects.all()
     serializer_class = TipoCasoSerializer
     permission_classes = [IsAuthenticated]
 
 
 class EstadoCasoViewSet(viewsets.ReadOnlyModelViewSet):
-    """GET /api/estados-caso/ — Listar estados de caso."""
+    """GET /api/estados-caso/ â€” Listar estados de caso."""
     queryset = EstadoCaso.objects.all()
     serializer_class = EstadoCasoSerializer
     permission_classes = [IsAuthenticated]
 
 
 class CasoViewSet(viewsets.ModelViewSet):
-    """CRUD /api/casos/ — Gestión de casos legales con filtros."""
+    """CRUD /api/casos/ â€” GestiÃ³n de casos legales con filtros."""
     queryset = Caso.objects.select_related(
         'oid_abogado', 'oid_tipo_caso', 'oid_estado'
     ).all()
@@ -164,14 +162,14 @@ class CasoViewSet(viewsets.ModelViewSet):
         return CasoSerializer
     
     def perform_create(self, serializer):
-        """Crear caso y automáticamente crear documento si se envía PDF."""
+        """Crear caso y automÃ¡ticamente crear documento si se envÃ­a PDF."""
         # Extraer el archivo PDF del request
         archivo_pdf = self.request.FILES.get('archivo_pdf')
         
         # Guardar el caso
         caso = serializer.save()
         
-        # Si hay PDF, crear documento automáticamente
+        # Si hay PDF, crear documento automÃ¡ticamente
         if archivo_pdf:
             nombre_archivo = archivo_pdf.name.rsplit('.', 1)[0]  # Remove .pdf extension
             Documento.objects.create(
@@ -183,7 +181,7 @@ class CasoViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['get'], url_path='descargar-documento')
     def descargar_documento(self, request, pk=None):
-        """GET /api/casos/{id}/descargar-documento/ — Descargar documento principal del caso."""
+        """GET /api/casos/{id}/descargar-documento/ â€” Descargar documento principal del caso."""
         caso = self.get_object()
         
         # Obtener el documento principal del caso
@@ -222,7 +220,7 @@ class CasoViewSet(viewsets.ModelViewSet):
 
 
 class CodigoLegalViewSet(viewsets.ModelViewSet):
-    """CRUD /api/codigos/ — Gestión de códigos legales con filtros."""
+    """CRUD /api/codigos/ â€” GestiÃ³n de cÃ³digos legales con filtros."""
     queryset = CodigoLegal.objects.all()
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
@@ -236,7 +234,7 @@ class CodigoLegalViewSet(viewsets.ModelViewSet):
 
 
 class CasoNormativaViewSet(viewsets.ModelViewSet):
-    """CRUD /api/caso-normativas/ — Asociar códigos legales a casos."""
+    """CRUD /api/caso-normativas/ â€” Asociar cÃ³digos legales a casos."""
     queryset = CasoNormativa.objects.select_related('oid_caso', 'oid_codigo').all()
     serializer_class = CasoNormativaSerializer
     permission_classes = [IsAuthenticated]
@@ -245,7 +243,7 @@ class CasoNormativaViewSet(viewsets.ModelViewSet):
 
 
 class DocumentoViewSet(viewsets.ModelViewSet):
-    """CRUD /api/documentos/ — Gestión de documentos PDF."""
+    """CRUD /api/documentos/ â€” GestiÃ³n de documentos PDF."""
     queryset = Documento.objects.select_related('oid_caso').all()
     serializer_class = DocumentoSerializer
     permission_classes = [IsAuthenticated]
@@ -254,14 +252,14 @@ class DocumentoViewSet(viewsets.ModelViewSet):
 
 
 class PlanViewSet(viewsets.ReadOnlyModelViewSet):
-    """GET /api/planes/ — Listar planes disponibles."""
+    """GET /api/planes/ â€” Listar planes disponibles."""
     queryset = Plan.objects.filter(estado=True)
     serializer_class = PlanSerializer
     permission_classes = [AllowAny]
 
 
 class PagoViewSet(viewsets.ModelViewSet):
-    """CRUD /api/pagos/ — Gestión de pagos."""
+    """CRUD /api/pagos/ â€” GestiÃ³n de pagos."""
     queryset = Pago.objects.select_related('oid_usuario', 'oid_plan').all()
     serializer_class = PagoSerializer
     permission_classes = [IsAuthenticated]
@@ -275,9 +273,28 @@ class PagoViewSet(viewsets.ModelViewSet):
             return self.queryset
         return self.queryset.filter(oid_usuario=user)
 
+    def perform_create(self, serializer):
+        user = self.request.user
+        pago = serializer.save(oid_usuario=user)
+
+        # Crear notificaciÃ³n in-app para el usuario sobre el pago
+        mensaje_notif = (
+            f"Estimado(a) {user.nombre or 'usuario'}, hemos recibido su solicitud para suscribirse al plan "
+            f"'{pago.oid_plan.nombre}' por un valor de ${pago.monto}. Un representante de nuestro equipo le contactará¡ "
+            f"próximamente al correo electrónico '{user.email}' (o puede escribirnos a pagos@legalfilemanager.com) "
+            f"para coordinar el pago correspondiente y activar todas sus funciones premium."
+        )
+        Notificacion.objects.create(
+            oid_usuario=user,
+            titulo=f"Solicitud de suscripción al Plan {pago.oid_plan.nombre}",
+            mensaje=mensaje_notif,
+            tipo="in-app",
+            leida=False
+        )
+
 
 class NotificacionViewSet(viewsets.ModelViewSet):
-    """CRUD /api/notificaciones/ — Sistema de notificaciones."""
+    """CRUD /api/notificaciones/ â€” Sistema de notificaciones."""
     queryset = Notificacion.objects.select_related('oid_usuario').all()
     serializer_class = NotificacionSerializer
     permission_classes = [IsAuthenticated]
@@ -308,28 +325,28 @@ class NotificacionViewSet(viewsets.ModelViewSet):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def password_reset_view(request):
-    """POST /api/auth/password-reset/ — Mock de reset de contraseña."""
+    """POST /api/auth/password-reset/ â€” Mock de reset de contraseÃ±a."""
     email = request.data.get('email')
     if not email:
         return Response({'error': 'Email es requerido'}, status=status.HTTP_400_BAD_REQUEST)
-    # Aquí iría la lógica de envío de email
-    return Response({'message': f'Se ha enviado un enlace de recuperación a {email}'})
+    # AquÃ­ irÃ­a la lÃ³gica de envÃ­o de email
+    return Response({'message': f'Se ha enviado un enlace de recuperaciÃ³n a {email}'})
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def verify_2fa_view(request):
-    """POST /api/auth/2fa/verify/ — Mock de verificación 2FA."""
+    """POST /api/auth/2fa/verify/ â€” Mock de verificaciÃ³n 2FA."""
     code = request.data.get('code')
     if code == "123456": # Mock validation
         return Response({'status': 'verified'})
-    return Response({'error': 'Código inválido'}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({'error': 'CÃ³digo invÃ¡lido'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def generar_reporte_pdf_view(request, caso_id):
-    """GET /api/reportes/caso/{id}/pdf/ — Mock de generación de PDF."""
+    """GET /api/reportes/caso/{id}/pdf/ â€” Mock de generaciÃ³n de PDF."""
     try:
         caso = Caso.objects.get(oid_caso=caso_id)
         # Mock de respuesta PDF
@@ -339,3 +356,4 @@ def generar_reporte_pdf_view(request, caso_id):
         })
     except Caso.DoesNotExist:
         return Response({'error': 'Caso no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
