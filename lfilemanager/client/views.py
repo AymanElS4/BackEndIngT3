@@ -282,10 +282,23 @@ class NotificacionViewSet(viewsets.ModelViewSet):
     serializer_class = NotificacionSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['leida', 'tipo']
+    filterset_fields = ['leida', 'tipo', 'oid_usuario']
 
     def get_queryset(self):
-        return self.queryset.filter(oid_usuario=self.request.user)
+        from django.db.models import Q
+        user = self.request.user
+        if user.oid_rol and user.oid_rol.nombre == 'Administrador':
+            return self.queryset
+        # Users see notifications targeted to them OR global notifications (oid_usuario is null)
+        return self.queryset.filter(Q(oid_usuario=user) | Q(oid_usuario__isnull=True))
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        if user.oid_rol and user.oid_rol.nombre == 'Administrador':
+            # Admin-created notifications are global (para todos)
+            serializer.save(oid_usuario=None)
+        else:
+            serializer.save(oid_usuario=user)
 
 
 # ============================================================

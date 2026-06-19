@@ -2,7 +2,7 @@
 Serializers para la API REST del sistema legal.
 """
 # pylint: disable=too-few-public-methods
-import filetype  
+import filetype
 from rest_framework import serializers  
 from .models import (
     Rol, Usuario, TipoCaso, EstadoCaso,
@@ -287,3 +287,6 @@ class NotificacionSerializer(serializers.ModelSerializer):
         model = Notificacion
         fields = '__all__'
         read_only_fields = ['oid_notificacion', 'fecha_creacion']
+        extra_kwargs = {
+            'oid_usuario': {'required': False, 'allow_null': True}
+        }
