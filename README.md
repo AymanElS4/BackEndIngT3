@@ -11,7 +11,7 @@
 1. Abrir una terminal en la carpeta del backend:
 
 ```bash
-cd "c:\Users\Ayman El Salous Mnz\OneDrive\Desktop\proyectos\BackEndIng\BackEndIng\lfilemanager"
+
 ```
 
 2. Crear e ingresar a un entorno virtual (opcional pero recomendado):
