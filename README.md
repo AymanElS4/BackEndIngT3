@@ -10,9 +10,6 @@
 
 1. Abrir una terminal en la carpeta del backend:
 
-```bash
-
-```
 
 2. Crear e ingresar a un entorno virtual (opcional pero recomendado):
 
