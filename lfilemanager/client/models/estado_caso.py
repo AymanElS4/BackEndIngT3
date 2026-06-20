@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class EstadoCaso(models.Model):
     """Modelo que define los posibles estados de un caso legal."""
     oid_estado = models.AutoField(primary_key=True)

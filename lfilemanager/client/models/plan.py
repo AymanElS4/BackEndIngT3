@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Plan(models.Model):
     """Modelo que define los planes de suscripción disponibles."""
     oid_plan = models.AutoField(primary_key=True)

@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from .rol import Rol
 
+
 class UsuarioManager(BaseUserManager):
     """Manager personalizado para el modelo Usuario."""
     def create_user(self, email, password=None, **extra_fields):
@@ -23,8 +24,10 @@ class UsuarioManager(BaseUserManager):
         extra_fields.setdefault('oid_rol', rol_admin)
         return self.create_user(email, password, **extra_fields)
 
+
 class Usuario(AbstractBaseUser, PermissionsMixin):
-    """Modelo que representa a un usuario del sistema (abogados, admins, etc.)."""
+    """Modelo que representa a un usuario del sistema (abogados, admins, etc.)"""
+
     oid_usuario = models.AutoField(primary_key=True)
     oid_rol = models.ForeignKey(
         Rol,
@@ -37,7 +40,8 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=100, unique=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)
     estado = models.BooleanField(default=True)
-    matricula_profesional = models.CharField(max_length=50, blank=True, default='')
+    matricula_profesional = models.CharField(
+        max_length=50, blank=True, default='')
     especialidad = models.CharField(max_length=100, blank=True, default='')
     telefono_contacto = models.CharField(max_length=20, blank=True, default='')
 

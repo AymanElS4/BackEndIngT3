@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Rol(models.Model):
     """Modelo que representa los roles de los usuarios en el sistema."""
     oid_rol = models.AutoField(primary_key=True)
