@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import dj_database_url
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -83,8 +84,8 @@ WSGI_APPLICATION = 'lfilemanager.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.parse(
-        "postgresql://neondb_owner:npg_SgXPnhKL45rM@ep-winter-sun-adcerytt.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require",
-        conn_health_checks=True  
+        os.environ.get("DATABASE_URL"),
+        conn_health_checks=True
     )
 }
 
