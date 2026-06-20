@@ -1,4 +1,4 @@
-﻿# pylint: disable=too-few-public-methods,import-error
+# pylint: disable=too-few-public-methods,import-error
 
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
@@ -14,13 +14,13 @@ class Rol(models.Model):
         db_table = 'rol'
 
     def __str__(self):
-        """Devuelve la representaciÃ³n en cadena del rol."""
+        """Devuelve la representación en cadena del rol."""
         return str(self.nombre)
 
 class UsuarioManager(BaseUserManager):
     """Manager personalizado para el modelo Usuario."""
     def create_user(self, email, password=None, **extra_fields):
-        """Crea y guarda un usuario con el email y contraseÃ±a dados."""
+        """Crea y guarda un usuario con el email y contraseña dados."""
         if not email:
             raise ValueError('El email es obligatorio')
         email = self.normalize_email(email)
@@ -30,7 +30,7 @@ class UsuarioManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
-        """Crea y guarda un superusuario con el email y contraseÃ±a dados."""
+        """Crea y guarda un superusuario con el email y contraseña dados."""
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         # Ensure a role exists for superuser
@@ -68,8 +68,13 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         """Metadatos del modelo Usuario."""
         db_table = 'usuario'
 
+    def save(self, *args, **kwargs):
+        """Guarda el usuario y sincroniza el estado de activación de Django."""
+        self.is_active = self.estado
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        """Devuelve la representaciÃ³n en cadena del usuario."""
+        """Devuelve la representación en cadena del usuario."""
         return f"{self.nombre} ({self.email})"
 
 class TipoCaso(models.Model):
@@ -83,7 +88,7 @@ class TipoCaso(models.Model):
         db_table = 'tipo_caso'
 
     def __str__(self):
-        """Devuelve la representaciÃ³n en cadena del tipo de caso."""
+        """Devuelve la representación en cadena del tipo de caso."""
         return str(self.nombre)
 
 class EstadoCaso(models.Model):
@@ -96,7 +101,7 @@ class EstadoCaso(models.Model):
         db_table = 'estado_caso'
 
     def __str__(self):
-        """Devuelve la representaciÃ³n en cadena del estado del caso."""
+        """Devuelve la representación en cadena del estado del caso."""
         return str(self.nombre)
 
 class Caso(models.Model):
@@ -133,11 +138,11 @@ class Caso(models.Model):
         ordering = ['-fecha_inicio']
 
     def __str__(self):
-        """Devuelve la representaciÃ³n en cadena del caso."""
-        return f"{self.numero_expediente} â€” {self.titulo}"
+        """Devuelve la representación en cadena del caso."""
+        return f"{self.numero_expediente} — {self.titulo}"
 
 class CodigoLegal(models.Model):
-    """Modelo que almacena normativas y cÃ³digos legales."""
+    """Modelo que almacena normativas y códigos legales."""
     oid_codigo = models.AutoField(primary_key=True)
     nombre_norma = models.CharField(max_length=100, db_index=True)
     numero_articulo = models.CharField(max_length=50, db_index=True)
@@ -152,11 +157,11 @@ class CodigoLegal(models.Model):
         unique_together = [('nombre_norma', 'numero_articulo')]
 
     def __str__(self):
-        """Devuelve la representaciÃ³n en cadena del cÃ³digo legal."""
-        return f"{self.nombre_norma} â€” Art. {self.numero_articulo}"
+        """Devuelve la representación en cadena del código legal."""
+        return f"{self.nombre_norma} — Art. {self.numero_articulo}"
 
 class CasoNormativa(models.Model):
-    """Modelo intermedio para la relaciÃ³n entre un caso y una normativa."""
+    """Modelo intermedio para la relación entre un caso y una normativa."""
     oid_relacion = models.AutoField(primary_key=True)
     oid_caso = models.ForeignKey(Caso, on_delete=models.CASCADE, db_column='oid_caso')
     oid_codigo = models.ForeignKey(CodigoLegal, on_delete=models.CASCADE, db_column='oid_codigo')
@@ -182,7 +187,7 @@ class Documento(models.Model):
         ordering = ['-fecha_subida']
 
 class Plan(models.Model):
-    """Modelo que define los planes de suscripciÃ³n disponibles."""
+    """Modelo que define los planes de suscripción disponibles."""
     oid_plan = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=50)
     precio_mensual = models.DecimalField(max_digits=10, decimal_places=2)
@@ -195,7 +200,7 @@ class Plan(models.Model):
         db_table = 'plan'
 
     def __str__(self):
-        """Devuelve la representaciÃ³n en cadena del plan."""
+        """Devuelve la representación en cadena del plan."""
         return str(self.nombre)
 
 class Pago(models.Model):
@@ -214,7 +219,7 @@ class Pago(models.Model):
         db_table = 'pago'
 
     def __str__(self):
-        """Devuelve la representaciÃ³n en cadena del pago."""
+        """Devuelve la representación en cadena del pago."""
         usuario_email = getattr(self.oid_usuario, 'email', None)
         usuario_display = usuario_email if usuario_email else 'Usuario desconocido'
         return f"Pago {self.oid_pago} - {usuario_display}"
@@ -235,7 +240,7 @@ class Notificacion(models.Model):
         ordering = ['-fecha_creacion']
 
     def __str__(self):
-        """Devuelve la representaciÃ³n en cadena de la notificaciÃ³n."""
+        """Devuelve la representación en cadena de la notificación."""
         usuario_email = getattr(self.oid_usuario, 'email', None)
         usuario_display = usuario_email if usuario_email else 'Sistema'
         return f"{self.titulo} - {usuario_display}"
