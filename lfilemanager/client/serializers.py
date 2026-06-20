@@ -203,7 +203,7 @@ class CodigoLegalListSerializer(serializers.ModelSerializer):
     class Meta:
         """Metaclase de CodigoLegalListSerializer."""
         model = CodigoLegal
-        fields = ['oid_codigo', 'nombre_norma', 'numero_articulo', 'vigencia', 'estado_vigencia']
+        fields = ['oid_codigo', 'nombre_norma', 'numero_articulo', 'vigencia', 'estado_vigencia', 'archivo_pdf']
         read_only_fields = ['oid_codigo']
 
     def get_estado_vigencia(self, obj):
@@ -214,19 +214,24 @@ class CodigoLegalListSerializer(serializers.ModelSerializer):
 class CodigoLegalSerializer(serializers.ModelSerializer):
     """Serializer completo para create/retrieve/update — incluye texto_contenido."""
     estado_vigencia = serializers.SerializerMethodField()
+    archivo_pdf = serializers.FileField(required=False, allow_null=True)
 
     class Meta:
         """Metaclase de CodigoLegalSerializer."""
         model = CodigoLegal
         fields = [
             'oid_codigo', 'nombre_norma', 'numero_articulo',
-            'texto_contenido', 'vigencia', 'estado_vigencia'
+            'texto_contenido', 'vigencia', 'estado_vigencia', 'archivo_pdf'
         ]
         read_only_fields = ['oid_codigo']
 
     def get_estado_vigencia(self, obj):
         """Retorna la etiqueta de vigencia legible."""
         return 'Vigente' if obj.vigencia else 'Histórico'
+
+    def validate_archivo_pdf(self, value):
+        """Valida que el archivo adjunto sea un PDF válido y no supere 50 MB."""
+        return validate_pdf_file(value)
 
 
 class CasoNormativaSerializer(serializers.ModelSerializer):

@@ -1,5 +1,6 @@
 # pylint: disable=too-few-public-methods,import-error
 
+# pyrefly: ignore [missing-import]
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 

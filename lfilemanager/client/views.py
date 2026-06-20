@@ -219,6 +219,7 @@ class CasoViewSet(viewsets.ModelViewSet):
 class CodigoLegalViewSet(viewsets.ModelViewSet):
     """CRUD /api/codigos/ — Gestión de códigos legales con filtros."""
     queryset = CodigoLegal.objects.all()
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['vigencia']
@@ -228,6 +229,38 @@ class CodigoLegalViewSet(viewsets.ModelViewSet):
         if self.action == 'list':
             return CodigoLegalListSerializer
         return CodigoLegalSerializer
+
+    @action(detail=True, methods=['get'], url_path='descargar-documento')
+    def descargar_documento(self, request, pk=None):
+        """GET /api/codigos/{id}/descargar-documento/ — Descargar archivo PDF del código legal."""
+        codigo = self.get_object()
+        
+        if not codigo.archivo_pdf:
+            return Response(
+                {'error': 'No hay documento disponible para descargar'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        try:
+            response = FileResponse(
+                codigo.archivo_pdf.open('rb'),
+                content_type='application/pdf'
+            )
+            filename = codigo.nombre_norma or f"codigo_{codigo.oid_codigo}"
+            if not filename.endswith('.pdf'):
+                filename += '.pdf'
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            return response
+        except FileNotFoundError:
+            return Response(
+                {'error': 'El archivo no se encuentra en el servidor'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {'error': f'Error al descargar: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class CasoNormativaViewSet(viewsets.ModelViewSet):
