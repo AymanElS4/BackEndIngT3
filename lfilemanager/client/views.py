@@ -143,7 +143,7 @@ class EstadoCasoViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class CasoViewSet(viewsets.ModelViewSet):
-    """CRUD /api/casos/ — Gestión de casos legales con filtros."""
+    """CRUD /api/casos/ — Gestión de casos legales con filtros (Aislamiento de Datos)."""
     queryset = Caso.objects.select_related(
         'oid_abogado', 'oid_tipo_caso', 'oid_estado'
     ).all()
@@ -154,6 +154,21 @@ class CasoViewSet(viewsets.ModelViewSet):
     search_fields = ['titulo', 'numero_expediente', 'descripcion', 'juzgado']
     ordering_fields = ['fecha_inicio', 'fecha_cierre', 'titulo']
 
+    # ============================================================
+    # CAMBIO IMPLEMENTADO: Row-Level Security
+    # ============================================================
+    def get_queryset(self):
+        """Filtra los casos para que los usuarios solo accedan a los suyos, 
+        a menos que sea Administrador.
+        """
+        user = self.request.user
+        # Si el usuario es Administrador, mantenemos el queryset completo para auditorías
+        if user.oid_rol and user.oid_rol.nombre == 'Administrador':
+            return self.queryset
+        # Si es un Abogado estándar, filtramos por la relación correcta (oid_abogado)
+        return self.queryset.filter(oid_abogado=user)
+    # ============================================================
+
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
             return CasoCreateSerializer
@@ -161,15 +176,11 @@ class CasoViewSet(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         """Crear caso y automáticamente crear documento si se envía PDF."""
-        # Extraer el archivo PDF del request
         archivo_pdf = self.request.FILES.get('archivo_pdf')
-        
-        # Guardar el caso
         caso = serializer.save()
         
-        # Si hay PDF, crear documento automáticamente
         if archivo_pdf:
-            nombre_archivo = archivo_pdf.name.rsplit('.', 1)[0]  # Remove .pdf extension
+            nombre_archivo = archivo_pdf.name.rsplit('.', 1)[0]
             Documento.objects.create(
                 oid_caso=caso,
                 nombre_archivo=nombre_archivo,
@@ -182,7 +193,6 @@ class CasoViewSet(viewsets.ModelViewSet):
         """GET /api/casos/{id}/descargar-documento/ — Descargar documento principal del caso."""
         caso = self.get_object()
         
-        # Obtener el documento principal del caso
         documento = Documento.objects.filter(
             oid_caso=caso,
             tipo_documento='Documento Principal'
@@ -214,7 +224,6 @@ class CasoViewSet(viewsets.ModelViewSet):
                 {'error': f'Error al descargar: {str(e)}'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
 
 class CodigoLegalViewSet(viewsets.ModelViewSet):
     """CRUD /api/codigos/ — Gestión de códigos legales con filtros."""

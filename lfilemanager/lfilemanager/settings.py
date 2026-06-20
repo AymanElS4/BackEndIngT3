@@ -87,12 +87,24 @@ db_url = os.environ.get("DATABASE_URL")
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': dj_database_url.parse(
-        db_url,
-        conn_health_checks=True
-    )
-}
+import sys
+
+# Detectamos si se está ejecutando la suite de tests
+if 'test' in sys.argv or any('pytest' in arg for arg in sys.argv):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',  # Base de datos ultra rápida en memoria para los tests
+        }
+    }
+else:
+    # CONFIGURACIÓN ORIGINAL (Tu código de producción se queda exactamente aquí)
+    DATABASES = {
+        'default': dj_database_url.parse(
+            db_url,
+            conn_health_checks=True
+            )
+    }
 
 
 # Password validation
