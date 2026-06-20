@@ -14,6 +14,8 @@ from pathlib import Path
 from datetime import timedelta
 import dj_database_url
 import os
+from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -78,13 +80,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'lfilemanager.wsgi.application'
 
+load_dotenv(os.path.join(BASE_DIR, '.env'))
+
+db_url = os.environ.get("DATABASE_URL")
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
     'default': dj_database_url.parse(
-        os.environ.get("DATABASE_URL"),
+        db_url,
         conn_health_checks=True
     )
 }
