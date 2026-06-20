@@ -2,7 +2,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 
-from .models import Rol, Usuario, Notificacion
+from ..models import Rol, Usuario, Notificacion
 
 
 class NotificacionApiTests(APITestCase):
