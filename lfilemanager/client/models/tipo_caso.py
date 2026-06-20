@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class TipoCaso(models.Model):
     """Modelo que define los distintos tipos de casos legales."""
     oid_tipo_caso = models.AutoField(primary_key=True)

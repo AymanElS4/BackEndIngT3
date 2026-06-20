@@ -28,8 +28,14 @@ pip install -r requirements.txt
 
 Para iniciar el backend en modo desarrollo:
 
+Ir a lfilemanager con 
 ```bash
-python manage.py runserver 0.0.0.0:8000
+cd lfilemanager 
+```
+y de ahí
+
+```bash
+python manage.py runserver 127.0.0.1:8000
 ```
 
 Esto levantará el backend en:

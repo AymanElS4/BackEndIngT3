@@ -3,6 +3,7 @@ from .usuario import Usuario
 from .tipo_caso import TipoCaso
 from .estado_caso import EstadoCaso
 
+
 class Caso(models.Model):
     """Modelo principal que representa un caso o expediente legal."""
     oid_caso = models.AutoField(primary_key=True)
