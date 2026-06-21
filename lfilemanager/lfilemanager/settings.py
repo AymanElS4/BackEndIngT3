@@ -14,13 +14,14 @@ from pathlib import Path
 from datetime import timedelta
 import dj_database_url
 import os
+import sys
 from pathlib import Path
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -80,25 +81,22 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'lfilemanager.wsgi.application'
 
-load_dotenv(os.path.join(BASE_DIR, '.env'))
-
 db_url = os.environ.get("DATABASE_URL")
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-import sys
 
 # Detectamos si se está ejecutando la suite de tests
 if 'test' in sys.argv or any('pytest' in arg for arg in sys.argv):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': ':memory:',  # Base de datos ultra rápida en memoria para los tests
+            'NAME': ':memory:',  # Base de datos en memoria para los tests
         }
     }
 else:
-    # CONFIGURACIÓN ORIGINAL (Tu código de producción se queda exactamente aquí)
+    # CONFIGURACIÓN ORIGINAL
     DATABASES = {
         'default': dj_database_url.parse(
             db_url,
@@ -217,7 +215,19 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
 }
+# ============================================================
+# Google Drive Storage Config (vía Google Apps Script)
+# ============================================================
+GAS_WEBHOOK_URL = os.environ.get("GAS_WEBHOOK_URL", "")
 
+STORAGES = {
+    "default": {
+        "BACKEND": "client.gas_storage.GASDriveStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
 # ============================================================
 # SimpleJWT Config

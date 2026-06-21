@@ -1,4 +1,5 @@
 from django.db import models
+from client.gas_storage import GASDriveStorage
 
 
 class CodigoLegal(models.Model):
@@ -8,7 +9,11 @@ class CodigoLegal(models.Model):
     numero_articulo = models.CharField(max_length=50, db_index=True)
     texto_contenido = models.TextField()
     archivo_pdf = models.FileField(
-        upload_to='codigos/%Y/%m/', null=True, blank=True)
+        upload_to='codigos/%Y/%m/', 
+        storage=GASDriveStorage(), 
+        null=True, 
+        blank=True
+    )
     vigencia = models.BooleanField(default=True, db_index=True)
 
     class Meta:

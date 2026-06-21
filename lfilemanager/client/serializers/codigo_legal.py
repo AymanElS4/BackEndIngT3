@@ -2,6 +2,7 @@ from rest_framework import serializers
 from ..models.codigo_legal import CodigoLegal
 from .validators import validate_pdf_file
 
+
 class CodigoLegalListSerializer(serializers.ModelSerializer):
     """Serializer ligero para listados.
 
@@ -18,6 +19,7 @@ class CodigoLegalListSerializer(serializers.ModelSerializer):
     def get_estado_vigencia(self, obj):
         """Retorna la etiqueta de vigencia legible."""
         return 'Vigente' if obj.vigencia else 'Histórico'
+
 
 class CodigoLegalSerializer(serializers.ModelSerializer):
     """Serializer completo para create/retrieve/update — incluye texto_contenido."""

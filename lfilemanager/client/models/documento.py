@@ -1,5 +1,6 @@
 from django.db import models
 from .caso import Caso
+from client.gas_storage import GASDriveStorage
 
 
 class Documento(models.Model):
@@ -8,7 +9,10 @@ class Documento(models.Model):
     oid_caso = models.ForeignKey(
         Caso, on_delete=models.CASCADE, db_column='oid_caso')
     nombre_archivo = models.CharField(max_length=150)
-    ruta_archivo = models.FileField(upload_to='documentos/%Y/%m/')
+    ruta_archivo = models.FileField(
+        upload_to='documentos/%Y/%m/',
+        storage=GASDriveStorage()
+    )
     tipo_documento = models.CharField(max_length=50)
     fecha_subida = models.DateTimeField(auto_now_add=True)
 

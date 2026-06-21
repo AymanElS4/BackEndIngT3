@@ -225,6 +225,7 @@ class CasoViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
+
 class CodigoLegalViewSet(viewsets.ModelViewSet):
     """CRUD /api/codigos/ — Gestión de códigos legales con filtros."""
     queryset = CodigoLegal.objects.all()
