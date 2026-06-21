@@ -16,8 +16,12 @@ class GASDriveStorage(Storage):
         file_content = content.read()
         base64_file = base64.b64encode(file_content).decode('utf-8')
         
+        path_parts = name.split('/')
+        folder_path = '/'.join(path_parts[:-1]) if len(path_parts) > 1 else ''
+        
         payload = {
-            "fileName": name.split('/')[-1],
+            "fileName": path_parts[-1],
+            "folderPath": folder_path,
             "fileType": getattr(content, 'content_type', 'application/pdf'),
             "base64File": base64_file
         }

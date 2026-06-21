@@ -2,6 +2,9 @@ from django.db import models
 from client.gas_storage import GASDriveStorage
 
 
+def codigo_upload_path(instance, filename):
+    return f'Códigos Legales/{instance.nombre_norma}/{filename}'
+
 class CodigoLegal(models.Model):
     """Modelo que almacena normativas y códigos legales."""
     oid_codigo = models.AutoField(primary_key=True)
@@ -9,7 +12,7 @@ class CodigoLegal(models.Model):
     numero_articulo = models.CharField(max_length=50, db_index=True)
     texto_contenido = models.TextField()
     archivo_pdf = models.FileField(
-        upload_to='codigos/%Y/%m/', 
+        upload_to=codigo_upload_path, 
         storage=GASDriveStorage(), 
         null=True, 
         blank=True
