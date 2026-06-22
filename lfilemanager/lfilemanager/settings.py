@@ -26,7 +26,7 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*!(79#dmd_+13n0jds9#mgofi3!3&y&d!(823j@%3gy8=q#f9a'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -157,10 +157,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Custom User Model
 AUTH_USER_MODEL = 'client.Usuario'
 
+ALLOWED_HOSTS = ['*']
 
 # ============================================================
 # CORS — Permitir que el frontend React conecte con el backend
 # ============================================================
+
+CORS_ALLOW_ALL_ORIGINS = True  # para después poner el de vercel
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
