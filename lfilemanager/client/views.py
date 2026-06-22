@@ -1,5 +1,6 @@
 
 from rest_framework import viewsets, status, permissions, filters
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
@@ -275,11 +276,32 @@ class CodigoLegalViewSet(viewsets.ModelViewSet):
 
 class CasoNormativaViewSet(viewsets.ModelViewSet):
     """CRUD /api/caso-normativas/ — Asociar códigos legales a casos."""
-    queryset = CasoNormativa.objects.select_related('oid_caso', 'oid_codigo').all()
+    queryset = CasoNormativa.objects.select_related(
+        'oid_caso', 'oid_codigo'
+    ).order_by('-fecha_asociacion')
     serializer_class = CasoNormativaSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['oid_caso', 'oid_codigo']
+
+    def get_queryset(self):
+        """Aísla las asociaciones por dueño del caso.
+
+        El Administrador ve todas; un abogado solo las de sus propios casos.
+        """
+        user = self.request.user
+        if user.oid_rol and user.oid_rol.nombre == 'Administrador':
+            return self.queryset
+        return self.queryset.filter(oid_caso__oid_abogado=user)
+
+    def perform_create(self, serializer):
+        """Impide asociar normativas a casos que no pertenecen al usuario."""
+        user = self.request.user
+        caso = serializer.validated_data.get('oid_caso')
+        is_admin = bool(user.oid_rol and user.oid_rol.nombre == 'Administrador')
+        if not is_admin and caso and caso.oid_abogado_id != user.oid_usuario:
+            raise PermissionDenied('No puede asociar normativas a un caso que no le pertenece.')
+        serializer.save()
 
 
 class DocumentoViewSet(viewsets.ModelViewSet):
