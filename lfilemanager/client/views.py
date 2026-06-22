@@ -9,6 +9,12 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import FileResponse
 from django.contrib.auth import authenticate
+from rest_framework.views import APIView
+from django.core.mail import send_mail
+from django.conf import settings
+import random
+from django.core.cache import cache  # usado para la recuperacion de passwords
+
 
 from .models import (
     Rol, Usuario, TipoCaso, EstadoCaso,
@@ -380,6 +386,68 @@ class NotificacionViewSet(viewsets.ModelViewSet):
             serializer.save(oid_usuario=user)
 
 
+class RequestPasswordResetView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email')
+        if not email:
+            return Response({"error": "El correo es requerido."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            user = Usuario.objects.get(email=email, estado=True)
+            
+            # 1. Generamos el código de 6 dígitos
+            codigo_otp = f"{random.randint(100000, 999999)}"
+            
+            # 2. Lo guardamos en el cache usando el email como llave.
+            # timeout=900 significa 15 minutos (900 segundos). Se borrará SOLO.
+            cache.set(f"recovery_{email}", codigo_otp, timeout=900)
+            
+            # 3. Enviamos el correo
+            asunto = "Código de Recuperación - Sistema de Gestión Legal"
+            mensaje = f"Hola {user.nombre},\n\nTu código de verificación es: {codigo_otp}\n\nExpira en 15 minutos."
+            
+            send_mail(asunto, mensaje, settings.DEFAULT_FROM_EMAIL, [user.email])
+            
+        except Usuario.DoesNotExist:
+            # Seguridad: no revelar si el correo existe o no
+            pass
+            
+        return Response({"message": "Código enviado si el correo existe."}, status=status.HTTP_200_OK)
+
+
+class ConfirmPasswordResetView(APIView):
+    permission_classes = [AllowAny]
+   
+    def post(self, request):
+        email = request.data.get('email')
+        codigo = request.data.get('codigo')
+        password = request.data.get('password')
+
+        if not all([email, codigo, password]):
+            return Response({"error": "Todos los campos son obligatorios."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 1. Recuperamos el código que guardamos en el cache
+        codigo_guardado = cache.get(f"recovery_{email}")
+
+        # 2. Si no existe (porque ya pasaron 15 min) o no coincide, rebotamos
+        if not codigo_guardado or codigo_guardado != str(codigo):
+            return Response({"error": "El código es inválido o ha expirado."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = Usuario.objects.get(email=email)
+            
+            # 3. Todo está bien, cambiamos la contraseña
+            user.set_password(password)
+            user.save()
+
+            # 4. Borramos el código del cache para que no se pueda reutilizar
+            cache.delete(f"recovery_{email}")
+
+            return Response({"message": "Contraseña actualizada con éxito."}, status=status.HTTP_200_OK)
+        except Usuario.DoesNotExist:
+            return Response({"error": "Usuario no encontrado."}, status=status.HTTP_404_NOT_FOUND)
 # ============================================================
 # Extra Functional Endpoints (Auth & Reports)
 # ============================================================

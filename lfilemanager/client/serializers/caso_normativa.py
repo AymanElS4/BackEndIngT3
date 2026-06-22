@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from ..models.caso_normativa import CasoNormativa
 
+
 class CasoNormativaSerializer(serializers.ModelSerializer):
     """Serializer para la relación entre Caso y CodigoLegal."""
     codigo_nombre = serializers.CharField(source='oid_codigo.nombre_norma', read_only=True)
