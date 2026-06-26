@@ -101,8 +101,6 @@ must be configured: `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, `DATABASE_URL`,
 `CORS_ALLOWED_ORIGINS`, `EMAIL_HOST` / `EMAIL_HOST_USER` / `EMAIL_HOST_PASSWORD`,
 and `GAS_WEBHOOK_URL`.
 
-Full deployment instructions and the production hardening checklist are documented in
-`Deployment_and_User_Documentation_EN.docx` / `.md`.
 
 ## Project structure
 
