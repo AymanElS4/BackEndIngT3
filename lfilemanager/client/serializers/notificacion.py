@@ -1,5 +1,7 @@
+"""Serializer for the Notificacion model."""
 from rest_framework import serializers
 from ..models.notificacion import Notificacion
+
 
 class NotificacionSerializer(serializers.ModelSerializer):
     """Serializer para el modelo Notificacion."""

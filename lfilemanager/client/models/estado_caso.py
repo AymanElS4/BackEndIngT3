@@ -1,3 +1,4 @@
+"""Module for the EstadoCaso model defining possible legal case statuses."""
 from django.db import models
 
 

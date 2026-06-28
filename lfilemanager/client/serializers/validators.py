@@ -1,5 +1,7 @@
+"""Custom validators for DRF serializers — PDF file validation."""
 import filetype
 from rest_framework import serializers
+
 
 def validate_pdf_file(value):
     """Valida que el archivo sea un PDF válido y no supere los 50 MB."""

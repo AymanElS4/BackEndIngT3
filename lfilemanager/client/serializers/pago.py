@@ -1,10 +1,14 @@
+"""Serializer for the Pago model."""
 from rest_framework import serializers
 from ..models.pago import Pago
 
+
 class PagoSerializer(serializers.ModelSerializer):
     """Serializer para el modelo Pago."""
-    usuario_email = serializers.CharField(source='oid_usuario.email', read_only=True)
-    plan_nombre = serializers.CharField(source='oid_plan.nombre', read_only=True)
+    usuario_email = serializers.CharField(
+        source='oid_usuario.email', read_only=True)
+    plan_nombre = serializers.CharField(
+        source='oid_plan.nombre', read_only=True)
 
     class Meta:
         """Metaclase de PagoSerializer."""

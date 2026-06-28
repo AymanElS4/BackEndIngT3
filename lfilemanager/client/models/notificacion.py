@@ -1,14 +1,20 @@
+"""Module for the Notificacion model."""
 from django.db import models
+
 from .usuario import Usuario
 
 
 class Notificacion(models.Model):
     """Modelo que gestiona las notificaciones enviadas a los usuarios."""
+
     oid_notificacion = models.AutoField(primary_key=True)
     oid_usuario = models.ForeignKey(
-        Usuario, 
-        on_delete=models.CASCADE, db_column='oid_usuario', 
-        null=True, blank=True)
+        Usuario,
+        on_delete=models.CASCADE,
+        db_column='oid_usuario',
+        null=True,
+        blank=True
+    )
     titulo = models.CharField(max_length=150)
     mensaje = models.TextField()
     tipo = models.CharField(max_length=30, default='in-app')
@@ -18,6 +24,7 @@ class Notificacion(models.Model):
 
     class Meta:
         """Metadatos del modelo Notificacion."""
+
         db_table = 'notificacion'
         ordering = ['-fecha_creacion']
 

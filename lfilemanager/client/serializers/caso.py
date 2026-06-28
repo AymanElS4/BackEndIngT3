@@ -1,14 +1,20 @@
+"""Serializers for the Caso model — read and create/update views."""
 from rest_framework import serializers
 from ..models.caso import Caso
 from ..models.documento import Documento
 from .validators import validate_pdf_file
 
+
 class CasoSerializer(serializers.ModelSerializer):
     """Serializer para Caso con datos expandidos."""
-    abogado_nombre = serializers.CharField(source='oid_abogado.nombre', read_only=True)
-    tipo_caso_nombre = serializers.CharField(source='oid_tipo_caso.nombre', read_only=True)
-    estado_nombre = serializers.CharField(source='oid_estado.nombre', read_only=True)
-    documentos_count = serializers.IntegerField(source='documentos.count', read_only=True)
+    abogado_nombre = serializers.CharField(
+        source='oid_abogado.nombre', read_only=True)
+    tipo_caso_nombre = serializers.CharField(
+        source='oid_tipo_caso.nombre', read_only=True)
+    estado_nombre = serializers.CharField(
+        source='oid_estado.nombre', read_only=True)
+    documentos_count = serializers.IntegerField(
+        source='documentos.count', read_only=True)
 
     class Meta:
         """Metaclase de CasoSerializer."""
@@ -23,9 +29,11 @@ class CasoSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['oid_caso']
 
+
 class CasoCreateSerializer(serializers.ModelSerializer):
     """Serializer para crear/editar un Caso con PDF."""
-    archivo_pdf = serializers.FileField(required=False, allow_null=True, write_only=True)
+    archivo_pdf = serializers.FileField(
+        required=False, allow_null=True, write_only=True)
 
     class Meta:
         """Metaclase de CasoCreateSerializer."""
@@ -37,11 +45,13 @@ class CasoCreateSerializer(serializers.ModelSerializer):
         ]
 
     def validate_archivo_pdf(self, value):
-        """Valida que el archivo adjunto sea un PDF válido y no supere 50 MB."""
+        """Valida que el archivo adjunto sea un PDF válido 
+        y no supere 50 MB."""
         return validate_pdf_file(value)
 
     def create(self, validated_data):
-        """Crea el Caso descartando el archivo PDF, que se gestiona por separado."""
+        """Crea el Caso descartando el archivo PDF
+        , que se gestiona por separado."""
         validated_data.pop('archivo_pdf', None)
         caso = Caso.objects.create(**validated_data)
         return caso

@@ -1,3 +1,4 @@
+"""Module for the Plan model defining available subscription plans."""
 from django.db import models
 
 

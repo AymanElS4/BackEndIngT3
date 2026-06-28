@@ -1,6 +1,8 @@
+"""Serializer for the Documento model."""
 from rest_framework import serializers
 from ..models.documento import Documento
 from .validators import validate_pdf_file
+
 
 class DocumentoSerializer(serializers.ModelSerializer):
     """Serializer para el modelo Documento."""

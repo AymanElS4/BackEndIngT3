@@ -1,3 +1,4 @@
+"""Module for the Caso model representing a legal case or expedient."""
 from django.db import models
 from .usuario import Usuario
 from .tipo_caso import TipoCaso

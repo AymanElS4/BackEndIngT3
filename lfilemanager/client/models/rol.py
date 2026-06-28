@@ -1,3 +1,4 @@
+"""Module for the Rol model representing user roles in the system."""
 from django.db import models
 
 

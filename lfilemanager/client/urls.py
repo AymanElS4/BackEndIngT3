@@ -1,5 +1,7 @@
+"""URL configuration for the client (API) application."""
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+
 from .views import (
     register_view, login_view, me_view,
     password_reset_view, verify_2fa_view, generar_reporte_pdf_view,
@@ -7,7 +9,7 @@ from .views import (
     EstadoCasoViewSet, CasoViewSet, CodigoLegalViewSet,
     RequestPasswordResetView, ConfirmPasswordResetView,
     CasoNormativaViewSet, DocumentoViewSet,
-    PlanViewSet, PagoViewSet, NotificacionViewSet
+    PlanViewSet, PagoViewSet, NotificacionViewSet,
 )
 
 router = DefaultRouter()
@@ -30,14 +32,18 @@ urlpatterns = [
     path('auth/me/', me_view, name='me'),
     path('auth/password-reset/', password_reset_view, name='password-reset'),
     path('auth/2fa/verify/', verify_2fa_view, name='2fa-verify'),
-    
-    path('auth/password-reset-request/', RequestPasswordResetView.as_view(),
-         name='password-reset-request'),
-    path('auth/password-reset-confirm/', ConfirmPasswordResetView.as_view(), 
-         name='password-reset-confirm'),
+    path(
+        'auth/password-reset-request/',
+        RequestPasswordResetView.as_view(),
+        name='password-reset-request',
+    ),
+    path(
+        'auth/password-reset-confirm/',
+        ConfirmPasswordResetView.as_view(),
+        name='password-reset-confirm',
+    ),
     # Reports
     path('reportes/caso/<int:caso_id>/pdf/', generar_reporte_pdf_view, name='reporte-pdf'),
-    
     # API Router
     path('', include(router.urls)),
 ]

@@ -1,3 +1,4 @@
+"""Module for the Pago model recording user payments."""
 from django.db import models
 from .usuario import Usuario
 from .plan import Plan

@@ -1,3 +1,4 @@
+"""Serializer for the CasoNormativa join model (case ↔ legal code)."""
 from rest_framework import serializers
 from ..models.caso_normativa import CasoNormativa
 

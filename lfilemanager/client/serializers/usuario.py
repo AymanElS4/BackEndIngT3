@@ -1,6 +1,8 @@
+"""Serializers for the Usuario model — registration, login, read and update."""
 from rest_framework import serializers
 from ..models.rol import Rol
 from ..models.usuario import Usuario
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     """Serializer para registro de nuevos usuarios."""
@@ -34,10 +36,12 @@ class RegisterSerializer(serializers.ModelSerializer):
         )
         return user
 
+
 class LoginSerializer(serializers.Serializer):
     """Serializer para login."""
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
+
 
 class UsuarioSerializer(serializers.ModelSerializer):
     """Serializer completo de Usuario (lectura)."""
@@ -52,6 +56,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
             'especialidad', 'telefono_contacto'
         ]
         read_only_fields = ['oid_usuario', 'fecha_registro']
+
 
 class UsuarioUpdateSerializer(serializers.ModelSerializer):
     """Serializer para actualizar usuario (Admin)."""

@@ -1,5 +1,7 @@
+"""Serializer for the Rol model."""
 from rest_framework import serializers
 from ..models.rol import Rol
+
 
 class RolSerializer(serializers.ModelSerializer):
     """Serializer para el modelo Rol."""

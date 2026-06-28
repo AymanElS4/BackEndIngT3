@@ -1,3 +1,4 @@
+"""Public API for the client serializers package — exports all serializer classes."""
 from .validators import validate_pdf_file
 from .usuario import (
     RegisterSerializer, LoginSerializer, UsuarioSerializer, UsuarioUpdateSerializer

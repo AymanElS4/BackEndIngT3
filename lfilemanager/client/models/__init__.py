@@ -1,3 +1,4 @@
+"""Public API for the client models package — exports all model classes."""
 from .rol import Rol
 from .usuario import Usuario, UsuarioManager
 from .tipo_caso import TipoCaso

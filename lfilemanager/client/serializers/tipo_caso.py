@@ -1,5 +1,7 @@
+"""Serializer for the TipoCaso model."""
 from rest_framework import serializers
 from ..models.tipo_caso import TipoCaso
+
 
 class TipoCasoSerializer(serializers.ModelSerializer):
     """Serializer para el modelo TipoCaso."""

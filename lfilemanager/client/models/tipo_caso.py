@@ -1,3 +1,4 @@
+"""Module for the TipoCaso model defining legal case types."""
 from django.db import models
 
 

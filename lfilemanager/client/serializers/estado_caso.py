@@ -1,5 +1,7 @@
+"""Serializer for the EstadoCaso model."""
 from rest_framework import serializers
 from ..models.estado_caso import EstadoCaso
+
 
 class EstadoCasoSerializer(serializers.ModelSerializer):
     """Serializer para el modelo EstadoCaso."""

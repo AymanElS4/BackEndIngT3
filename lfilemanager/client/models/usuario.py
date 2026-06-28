@@ -1,3 +1,5 @@
+"""Modulo para el modelo Usuario — custom user model 
+with email-based authentication."""
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from .rol import Rol
