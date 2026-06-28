@@ -58,3 +58,46 @@ class TestCaseService:
         
         resultados = response.json().get('results', response.json())
         assert len(resultados) == 1
+
+
+    def test_search_legal_case_by_keyword_shows_correct_case(self):
+        """TC-12: Buscar un caso legal por palabra clave muestra el caso correcto."""
+        self.client.force_authenticate(user=self.lawyer_1)
+        
+        url = reverse('caso-list')
+        query_params = {'search': 'Gonzales'}
+        
+        response = self.client.get(url, query_params)
+        
+        assert response.status_code == status.HTTP_200_OK
+        # Apuntamos a 'results' debido a la paginación del API
+        assert len(response.data['results']) == 1
+        assert response.data['results'][0]['titulo'] == "Caso Gonzales v. Banco"
+
+    def test_register_new_case_saves_successfully(self):
+        """TC-13: Registrar un nuevo caso guarda exitosamente en la BD."""
+        self.client.force_authenticate(user=self.lawyer_1)
+        url = reverse('caso-list')
+
+        try:
+            oid_tipo = self.case_1.oid_tipo_caso.oid_tipo_caso
+            oid_estado = self.case_1.oid_estado.oid_estado
+        except AttributeError:
+            oid_tipo = 1
+            oid_estado = 1
+
+        # PAYLOAD CORREGIDO: Añadimos la fecha requerida por las reglas del backend
+        payload = {
+            "titulo": "Gonzales vs State",
+            "numero_expediente": "EXP-2026-999",
+            "descripcion": "Litigio constitucional",
+            "fecha_inicio": "2026-06-01",  # <--- Campo obligatorio agregado
+            "oid_abogado": self.lawyer_1.oid_usuario,
+            "oid_tipo_caso": oid_tipo,
+            "oid_estado": oid_estado
+        }
+
+        response = self.client.post(url, payload, format='json')
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.data['titulo'] == "Gonzales vs State"

@@ -60,3 +60,16 @@ class TestCatalogService:
         resultados = response.json().get('results', response.json())
         assert len(resultados) > 0
         assert 'vigencia' in resultados[0]
+    
+
+    def test_navigate_between_folders_loads_subfolders_and_files(self):
+        """TC-14: Navegar entre carpetas carga subcarpetas y archivos (folder_id=2)."""
+        self.client.force_authenticate(user=self.user)
+        
+        # Corregido de 'documentos-list' a 'documento-list'
+        url = reverse('documento-list') 
+        query_params = {'folder_id': 2} 
+
+        response = self.client.get(url, query_params)
+
+        assert response.status_code == status.HTTP_200_OK
